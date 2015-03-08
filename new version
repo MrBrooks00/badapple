@@ -7,21 +7,52 @@
 #include <fstream>
 
 #include "windows.h"
-
+ #define   PERR(bSuccess,   api) {if(!(bSuccess))   printf("%s:Error   %d   from   %s   on   line   %d\n",   __FILE__,  GetLastError(),   api,   __LINE__);}   
 using namespace std;
 
- #define   PERR(bSuccess,   api)
- {
- if(!(bSuccess))   printf("%s:Error   %d   from   %s   on   line   %d\n",   __FILE__,  
- GetLastError(),   api,   __LINE__);
- }   
+
 clock_t NowTime;
 const int FRAMES_PER_SECOND = 15;
 int timeNex;
 int timeUse;
 int frame = 0;
 int NowFPS;
-
+ void   cls(   HANDLE   hConsole   )   
+    {   
+           COORD   coordScreen   =   {   0,   0   };         /*  定义光标的位置*/     
+           BOOL   bSuccess;   
+          DWORD   cCharsWritten;   
+          CONSOLE_SCREEN_BUFFER_INFO   csbi;   /*  获取缓冲区信息 */     
+           DWORD   dwConSize;                /*   当前缓冲区的字符数 */     
+     
+          /*   获取当前缓冲区的字符数  */     
+    
+         bSuccess   =   GetConsoleScreenBufferInfo(   hConsole,   &csbi   );   
+          PERR(   bSuccess,   "GetConsoleScreenBufferInfo"   );   
+          dwConSize   =   csbi.dwSize.X   *   csbi.dwSize.Y;   
+    
+          /*   用空格填充整个屏幕   */     
+   
+          bSuccess   =   FillConsoleOutputCharacter(   hConsole,   (TCHAR)   '   ',   
+                dwConSize,   coordScreen,   &cCharsWritten   );   
+        PERR(   bSuccess,   "FillConsoleOutputCharacter"   );   
+    
+         /*   获取当前文本属性   */     
+    
+          bSuccess   =   GetConsoleScreenBufferInfo(   hConsole,   &csbi   );   
+          PERR(   bSuccess,   "ConsoleScreenBufferInfo"   );   
+    
+          /*   相应地设置缓冲区属性  */     
+   
+          bSuccess   =   FillConsoleOutputAttribute(   hConsole,   csbi.wAttributes,   
+                dwConSize,   coordScreen,   &cCharsWritten   );   
+          PERR(   bSuccess,   "FillConsoleOutputAttribute"   );   
+    
+          /*   把光标放在(0,0)   */     
+              bSuccess   =   SetConsoleCursorPosition(   hConsole,   coordScreen   );   
+          PERR(   bSuccess,   "SetConsoleCursorPosition"   );   
+          return;   
+  }
 int main(int argc, char **argv) {
     //自己想
     filebuf * pbuffer;
@@ -77,40 +108,5 @@ int main(int argc, char **argv) {
     return 0;
     infile.close();
     getch();
-    void   cls(   HANDLE   hConsole   )   
-    {   
-           COORD   coordScreen   =   {   0,   0   };         /*  定义光标的位置*/     
-           BOOL   bSuccess;   
-          DWORD   cCharsWritten;   
-          CONSOLE_SCREEN_BUFFER_INFO   csbi;   /*  获取缓冲区信息 */     
-           DWORD   dwConSize;                /*   当前缓冲区的字符数 */     
-     
-          /*   获取当前缓冲区的字符数  */     
-    
-         bSuccess   =   GetConsoleScreenBufferInfo(   hConsole,   &csbi   );   
-          PERR(   bSuccess,   "GetConsoleScreenBufferInfo"   );   
-          dwConSize   =   csbi.dwSize.X   *   csbi.dwSize.Y;   
-    
-          /*   用空格填充整个屏幕   */     
    
-          bSuccess   =   FillConsoleOutputCharacter(   hConsole,   (TCHAR)   '   ',   
-                dwConSize,   coordScreen,   &cCharsWritten   );   
-        PERR(   bSuccess,   "FillConsoleOutputCharacter"   );   
-    
-         /*   获取当前文本属性   */     
-    
-          bSuccess   =   GetConsoleScreenBufferInfo(   hConsole,   &csbi   );   
-          PERR(   bSuccess,   "ConsoleScreenBufferInfo"   );   
-    
-          /*   相应地设置缓冲区属性  */     
-   
-          bSuccess   =   FillConsoleOutputAttribute(   hConsole,   csbi.wAttributes,   
-                dwConSize,   coordScreen,   &cCharsWritten   );   
-          PERR(   bSuccess,   "FillConsoleOutputAttribute"   );   
-    
-          /*   把光标放在(0,0)   */     
-              bSuccess   =   SetConsoleCursorPosition(   hConsole,   coordScreen   );   
-          PERR(   bSuccess,   "SetConsoleCursorPosition"   );   
-          return;   
-   }
 }
